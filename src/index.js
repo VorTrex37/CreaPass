@@ -71,6 +71,6 @@ app.post('/generate', (req, res, next) => {
 // STARTUP
 // -------
 
-app.listen(process.env.PORT, () => {
-  console.log('CreaPass app listening on port ' + process.env.PORT);
+app.listen(process.env.PORT_NODE, () => {
+  console.log('CreaPass app listening on port ' + process.env.PORT_NODE);
 });

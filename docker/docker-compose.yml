@@ -1,0 +1,26 @@
+# #############################################################################
+# Docker Main Parameters
+# #############################################################################
+version: '3.1'
+
+services:
+  app:
+    image: ${APP_NAME}/npm-builder
+    container_name: ${APP_NAME}_app_${REVISION}_${SHORT_ENVIRONMENT}
+    build:
+      context: ./../
+      dockerfile: ./docker/npm/Dockerfile
+      args:
+        APP_NAME: ${APP_NAME}
+        DEFAULT_USER: node
+        DEFAULT_USER_UID: ${DEFAULT_USER_UID}
+        DEFAULT_USER_GUID: ${DEFAULT_USER_GUID}
+    env_file:
+    - ${DOCKER_ENV_TMP_FILE}
+    ports:
+    - ${PORT_NODE}:${PORT_NODE}
+    environment:
+    - HOST_ENV=${HOST_ENV}
+    - DEPLOYMENT_ENV=${DEPLOYMENT_ENV}
+    - REVISION=${REVISION}
+    restart: unless-stopped
