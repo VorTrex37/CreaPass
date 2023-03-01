@@ -35,7 +35,7 @@ DEPLOYMENT_ENV = none
 ###############################################################################
 # Set environment (dev or prod)
 ###############################################################################
-ENVIRONMENT = $(shell [ -f ../ENV ] && cat ../ENV || echo development)
+ENVIRONMENT = $(shell [ -f ./ENV ] && cat ./ENV || echo production)
 
 $(info $$ENVIRONMENT is [${ENVIRONMENT}])
 
@@ -64,11 +64,11 @@ ifeq ($(ENVIRONMENT), development)
 DOCKER_COMPOSE_MAIN_FILE_SELECTED = $(DOCKER_COMPOSE_MAIN_FILE) -f $(DOCKER_COMPOSE_DEV_FILE)
 COMPOSER_FLAGS = 
 NETWORK_SUFFIX = dev
-DEPLOYMENT_ENV = developmentbuild-project
+DEPLOYMENT_ENV = development
 endif
 
 ifeq ($(DEPLOYMENT_ENV), none )
- $(error "$$DEPLOYMENT_ENV not defined in ../ENV file ")
+ $(error "$$DEPLOYMENT_ENV not defined in ./ENV file ")
 endif
 
 export APP_NAME = $(shell grep -e "^APP_NAME="  ${PATH_ROOT}/config/.env.${DEPLOYMENT_ENV}.tpl | cut -d '=' -f2 | tr -d '"' | tr -d "'")
