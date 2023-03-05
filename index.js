@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 
 // GENERAL SETUP
@@ -7,6 +8,13 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+function getKeyList() {
+  if(!fs.existsSync('keyList.json')) {
+    fs.writeFileSync('keyList.json', '[\n\t{\n\tname:"Example de nom",\n\tkey:"Exemple de clé"\n\t},\n]');
+  }
+  return JSON.parse(fs.readFileSync('keyList.json', 'utf8'));
+}
+const keyList = getKeyList();
 
 // EXPRESS SETUP
 // -------------
@@ -16,6 +24,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
+// AUTHENTICATION MIDDLEWARE
+// -------------------------
+
+const authenticationMiddleware = (req, res, next) => {
+  const key = req.header("x-api-key");
+  if (key == null || key == undefined) {
+      return res.sendStatus(401);
+  }
+  if (keyList.find((elem) => elem.key === key)) {
+    next();
+  }
+  return res.sendStatus(403);
+};
+
+
 // ROUTES
 // ------
 
@@ -23,7 +46,7 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 });
 
-app.post('/generate', (req, res, next) => {
+app.post('/generate', authenticationMiddleware, (req, res, next) => {
   let size = req.body.size ? req.body.size : 20;
   let allowed = req.body.allowed ? req.body.allowed : '';
   let filter = req.body.filter ? req.body.filter : '';
