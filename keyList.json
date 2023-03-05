@@ -1,6 +1,6 @@
 [
 	{
-	name:"Example de nom",
-	key:"Exemple de clé"
-	},
+		"name":"Example de nom",
+		"key":"Exemple de clé"
+	}
 ]
