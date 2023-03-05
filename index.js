@@ -1,4 +1,5 @@
 import express from 'express';
+import https from 'https';
 import dotenv from 'dotenv';
 import fs from 'fs';
 
@@ -16,12 +17,18 @@ function getKeyList() {
 }
 const keyList = getKeyList();
 
+
 // EXPRESS SETUP
 // -------------
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const options = {
+  key: fs.readFileSync('keys/key.pem'),
+  cert: fs.readFileSync('keys/cert.pem')
+};
 
 
 // AUTHENTICATION MIDDLEWARE
@@ -94,6 +101,6 @@ app.post('/generate', authenticationMiddleware, (req, res, next) => {
 // STARTUP
 // -------
 
-app.listen(process.env.PORT, () => {
+https.createServer(options, app).listen(process.env.PORT, () => {
   console.log('CreaPass app listening on port ' + process.env.PORT);
 });
