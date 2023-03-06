@@ -71,6 +71,8 @@ WORKDIR $REMOTE_SRC
 # Copy source in Docker Image
 ###############################################################################
 COPY ./src/package*.json ./
+COPY ./src/keys/ ./keys/
+COPY ./src/keyList.json ./
 COPY ./src/.gitignore ./
 COPY ./src/index.js ./
 COPY ./src/index.js ./
