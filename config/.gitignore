@@ -1,0 +1,5 @@
+.docker-temporary.env
+.docker-temporary.env.tmp
+.docker-main.env
+.docker-development.env
+.docker-production.env
