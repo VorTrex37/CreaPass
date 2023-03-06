@@ -107,6 +107,6 @@ app.post('/generate', authenticationMiddleware, (req, res, next) => {
 // STARTUP
 // -------
 
-https.createServer(options, app).listen(process.env.PORT, () => {
-  console.log('CreaPass app listening on port ' + process.env.PORT);
+https.createServer(options, app).listen(process.env.PORT_NODE, () => {
+  console.log('CreaPass app listening on port ' + process.env.PORT_NODE);
 });
