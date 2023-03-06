@@ -5,40 +5,8 @@ CreaPass est une API hautement paramétrable permettant la génération simple e
 
 ## Installation & Déploiement 📦
 
-### Cloner CreaPass
+*// TODO*
 
-```bash
-git clone https://github.com/VorTrex37/CreaPass.git
-```
-
-```bash
-cd creapass
-```
-
-## Usage
-
-### Choix de l'environnement
-
-Par défaut, le projet se lance en mode production. Pour changer l'environnement du projet il vos faudra créer un fichier ENV à la racine du projet et y écrire l'environnement dans lequel vous souhaitez lancer le projet. 2 environnements sont disponibles :
-
-* development
-* production
-
-```bash
-echo dev > ENV # Environnement de développement
-echo prod > ENV # Environnement de production
-```
-
-## Makefile
-
-### Lancer le projet
-
-Pour build l'environnement Docker, il vous faudra installer [Docker](https://www.docker.com/get-started).
-Et enfin, il ne vous restera plus qu'a taper la commande suivante dans un terminal :
-
-```bash
-make
-```
 
 ## Utilisation 📝
 
@@ -100,7 +68,7 @@ Exemples :
 ## Contributeurs
 
 - Thomas ASPA
-- Soren MARCELINO 
+- Soren MARCELINO
 - Anthony NAVARRO
 - Milan VERY-GRIETTE
   
