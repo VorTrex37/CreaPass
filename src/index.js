@@ -1,17 +1,49 @@
 import express from 'express';
+import https from 'https';
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 // GENERAL SETUP
 // ---------
 
 dotenv.config();
 
+function getKeyList() {
+  if(!fs.existsSync('keyList.json')) {
+    fs.writeFileSync('keyList.json', '[\n\t{\n\tname:"Example de nom",\n\tkey:"Exemple de clé"\n\t},\n]');
+  }
+  return JSON.parse(fs.readFileSync('keyList.json', 'utf8'));
+}
+const keyList = getKeyList();
+
+
 // EXPRESS SETUP
 // -------------
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
+
+const options = {
+  key: fs.readFileSync('keys/key.pem'),
+  cert: fs.readFileSync('keys/cert.pem')
+};
+
+
+// AUTHENTICATION MIDDLEWARE
+// -------------------------
+
+const authenticationMiddleware = (req, res, next) => {
+  const key = req.header("x-api-key");
+  if (key == null || key == undefined) {
+      return res.sendStatus(401);
+  }
+  if (keyList.find((elem) => elem.key === key)) {
+    next();
+  }
+  return res.sendStatus(403);
+};
+
 
 // ROUTES
 // ------
@@ -20,7 +52,7 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 });
 
-app.post('/generate', (req, res, next) => {
+app.post('/generate', authenticationMiddleware, (req, res, next) => {
   let size = req.body.size ? req.body.size : 20;
   let allowed = req.body.allowed ? req.body.allowed : '';
   let filter = req.body.filter ? req.body.filter : '';
@@ -75,6 +107,6 @@ app.post('/generate', (req, res, next) => {
 // STARTUP
 // -------
 
-app.listen(process.env.PORT_NODE, () => {
-  console.log('CreaPass app listening on port ' + process.env.PORT_NODE);
+https.createServer(options, app).listen(process.env.PORT, () => {
+  console.log('CreaPass app listening on port ' + process.env.PORT);
 });
