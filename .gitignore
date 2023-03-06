@@ -4,3 +4,6 @@
 # Docker files
 ENV
 VERSION
+
+# Certs
+*.pem
