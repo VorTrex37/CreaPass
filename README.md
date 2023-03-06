@@ -30,7 +30,8 @@ echo prod > ENV # Environnement de production
 ```
 ### Création des fichiers d'environnement
 
-Les fichiers d'environnement se trouvent dans le dossier config à la racine, vous devez copier les fichiers dans le dossier config ".dist" et les renommer en supprimer le ".dist" du nom.
+Les fichiers d'environnement se trouvent dans le dossier config à la racine, vous devez copier les fichiers ".dist" dans le dossier config et les renommer sans le ".dist" du nom.
+
 Puis spécifier les variables d'environnement dans ces nouveaux fichiers.
 
 ## Makefile
