@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Keylist file
+keyList.json
