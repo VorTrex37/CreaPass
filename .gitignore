@@ -1,2 +1,6 @@
-VERSION
+# JetBrains files
+.idea
+
+# Docker files
 ENV
+VERSION
