@@ -28,6 +28,10 @@ Par défaut, le projet se lance en mode production. Pour changer l'environnement
 echo dev > ENV # Environnement de développement
 echo prod > ENV # Environnement de production
 ```
+### Création des fichiers d'environnement
+
+Les fichiers d'environnement se trouvent dans le dossier config à la racine, vous devez copier les fichiers dans le dossier config ".dist" et les renommer en supprimer le ".dist" du nom.
+Puis spécifier les variables d'environnement dans ces nouveaux fichiers.
 
 ## Makefile
 
