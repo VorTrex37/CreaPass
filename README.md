@@ -47,6 +47,10 @@ make
 
 ## Utilisation 📝
 
+Afin de restreindre l'accès à l'API, le header HTTP `x-api-key` de toutes les requêtes doit contenir une clé présente dans le fichier `keyList.json` (dans le champ `key`).
+
+Un modèle de ce fichier est présent dans le projet (`keyList.json.dist`).
+
 ### Génération d'un mot de passe
 
 Route : `POST /generate`
