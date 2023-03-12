@@ -56,6 +56,7 @@ app.post('/generate', authenticationMiddleware, (req, res, next) => {
   let size = req.body.size ? req.body.size : 20;
   let allowed = req.body.allowed ? req.body.allowed : '';
   let filter = req.body.filter ? req.body.filter : '';
+  let isEntropy = req.body.isEntropy ? req.body.isEntropy : true;
 
   const lowercase = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
     'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
@@ -98,10 +99,12 @@ app.post('/generate', authenticationMiddleware, (req, res, next) => {
 
   // PASSWORD ENTROPY
   let entropy;
-  entropy = size * (Math.log(charDB.length) / Math.log(2));
-  console.log(entropy);
+  if(isEntropy === true) {
+    entropy = size * (Math.log(charDB.length) / Math.log(2));
+    res.status(200).json({password, entropy});
+  }
 
-  res.status(200).json({password, entropy});
+  res.status(200).json(password);
 });
 
 // STARTUP
