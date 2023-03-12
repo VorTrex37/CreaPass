@@ -105,6 +105,18 @@ Exemples :
 - `!&` : Mot de passe sans ! et &
 - `abc8` : Mot de passe sans lettre a, b, c et sans chiffre 8
 
+---
+__Entropie__
+
+Nom du paramètre : `isEntropy`
+
+Par défaut : `true`
+
+Valeur attendue : Booléen
+
+Exemples : 
+- `true` : Entropie calculée
+- `false` : Entropie non calculée
 
 ## Contributeurs
 
