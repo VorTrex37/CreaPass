@@ -2,6 +2,7 @@ import express from 'express';
 import https from 'https';
 import dotenv from 'dotenv';
 import fs from 'fs';
+import cors from 'cors';
 
 // GENERAL SETUP
 // ---------
@@ -23,6 +24,7 @@ const keyList = getKeyList();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 const options = {
   key: fs.readFileSync('keys/key.pem'),
