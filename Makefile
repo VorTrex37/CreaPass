@@ -72,7 +72,6 @@ ifeq ($(DEPLOYMENT_ENV), none )
 endif
 
 export APP_NAME = $(shell grep -e "^APP_NAME="  ${PATH_ROOT}/config/.env.${DEPLOYMENT_ENV}.tpl | cut -d '=' -f2 | tr -d '"' | tr -d "'")
-export TRAEFIK_NAME = $(shell grep -e "^TRAEFIK_NAME="  ${PATH_ROOT}/config/.env.${DEPLOYMENT_ENV}.tpl | cut -d '=' -f2 | tr -d '"' | tr -d "'" | cut -d '_' -f2-)
 DOCKER_ENV_FILE = ${PATH_ROOT}/config/.docker-${DEPLOYMENT_ENV}.env
 
 ####################################################################{###########
@@ -81,9 +80,6 @@ DOCKER_ENV_FILE = ${PATH_ROOT}/config/.docker-${DEPLOYMENT_ENV}.env
 # build-project ==> Build the project
 build-project: build-project-without-start upall
 build-project-without-start: prerequisite update-project build-containers
-
-# rebuild-project ===> rebuild all containers
-rebuild-project: build-containers upall
 
 # buildall ===> build all containers
 buildall: prerequisite build-containers
@@ -97,10 +93,6 @@ downall: prerequisite
 upall : prerequisite
 	@printf $(call message_info, Up all 🚀)
 	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) up -d
-
-# haltall ===> Halts all the docker containers
-haltall: prerequisite  valid-container select-composefile
-	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) kill
 
 ###############################################################################
 # target to clean docker images and dependencies
@@ -141,35 +133,21 @@ run: prerequisite valid-container select-composefile
 stop: prerequisite valid-container select-composefile
 	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) stop $(filter-out $@,$(MAKECMDGOALS))
 
-# halt ===> Halts the docker containers
-halt: prerequisite  valid-container select-composefile
-	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) kill $(filter-out $@,$(MAKECMDGOALS))
-
 # Logs ==> get logs from the docker containers
 logs: prerequisite valid-container select-composefile
 	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) logs --tail=100 -f $(filter-out $@,$(MAKECMDGOALS))
 
-###############################################################################
-# status container(s)
-###############################################################################
-# status ===> Echos the container status
-status: prerequisite
-	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) ps
-
-# config ===> get container gonfig
-config: prerequisite
-	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) config
 
 ###############################################################################
 # connect container(s)
 ###############################################################################
 # bash ===> get bash into the docker containers
-bash: prerequisite valid-container select-composefile select-user
-	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) exec $(DOCKER_USER) $(filter-out $@,$(MAKECMDGOALS)) bash
+sh: prerequisite valid-container select-composefile select-user
+	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) exec $(DOCKER_USER) $(filter-out $@,$(MAKECMDGOALS)) sh
 
 # bash-root ===> get bash into the docker containers with root user
-bash-root: prerequisite valid-container select-composefile select-user
-	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) exec $(filter-out $@,$(MAKECMDGOALS)) bash
+sh-root: prerequisite valid-container select-composefile select-user
+	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE)  -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) exec $(filter-out $@,$(MAKECMDGOALS)) sh
 
 ###############################################################################
 # npm tools targets
@@ -181,18 +159,8 @@ npm-install: prerequisite
 npm-remove: prerequisite
 	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE) -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) run app npm remove $(filter-out $@,$(MAKECMDGOALS))
 
-npm-rebuild: prerequisite
-	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE) -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) run app npm rebuild $(filter-out $@,$(MAKECMDGOALS))
-
 npm-update: prerequisite
 	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE) -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) run app npm update $(filter-out $@,$(MAKECMDGOALS))
-
-npm-cache-clear: prerequisite
-	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE) -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) run app npm cache clean --force $(filter-out $@,$(MAKECMDGOALS))
-
-npm-cache-verify: prerequisite
-	@$(DOCKER_COMPOSE) --env-file $(DOCKER_ENV_TMP_FILE) -f $(DOCKER_COMPOSE_MAIN_FILE_SELECTED) run app npm npm cache verify $(filter-out $@,$(MAKECMDGOALS))
-
 ###############################################################################
 # internal targets prerequisite
 ###############################################################################
@@ -202,14 +170,13 @@ include $(DOCKER_ENV_FILE)
 
 export ENV_FILE = $(DOCKER_ENV_FILE)
 export PROJECT_DIRECTORY = ${PATH_ROOT}
-export REVISION = $(shell [ -f ./VERSION ] && cat ./VERSION || ( echo 0.0.0  && echo '0.0.0' > ./VERSION ) )
 export SHORT_ENVIRONMENT = $(shell echo ${ENVIRONMENT} | cut -c1-3)
 export ENV_FILE_NAME=$(shell basename ${ENV_FILE})
 export APP_ENV = $(shell grep -e "^APP_ENV="  ${PATH_ROOT}/config/.env.${DEPLOYMENT_ENV}.tpl | cut -d '=' -f2 )
 
 export DOCKER_ENV_TMP_FILE
 export DEPLOYMENT_ENV
-export CONTAINER_NAME_APP=${APP_NAME}_app_${REVISION}_${SHORT_ENVIRONMENT}
+export CONTAINER_NAME_APP=${APP_NAME}_app_${SHORT_ENVIRONMENT}
 export NETWORK_SUFFIX
 
 revision:
@@ -217,7 +184,6 @@ revision:
 	$(info $$ENV_FILE_NAME is [${ENV_FILE_NAME}])
 	$(info $$APP_ENV is [${APP_ENV}])
 	$(info $$DEPLOYMENT_ENV is [${DEPLOYMENT_ENV}])
-	$(info $$REVISION is [${REVISION}])
 	$(info $$SHORT_ENVIRONMENT is [${SHORT_ENVIRONMENT}])
 	$(info $$DOCKER_COMPOSE_MAIN_FILE_SELECTED is [${DOCKER_COMPOSE_MAIN_FILE_SELECTED}])
 	$(info $$NETWORK_SUFFIX is [${NETWORK_SUFFIX}])
@@ -280,10 +246,20 @@ ifeq ($(filter $(filter-out $(ACTIONS) $@,$(MAKECMDGOALS)),$(CONTAINERS)),)
 endif
 
 ###############################################################################
+# internal target select-composefile (set pre-build compose file if necessary)
+###############################################################################
+select-composefile:
+# $(info select-composefile call)
+ifneq ($(filter $(filter-out $@,$(MAKECMDGOALS)),$(PREBUILD_CONTAINERS)),)
+DOCKER_COMPOSE_MAIN_FILE_SELECTED = $(DOCKER_COMPOSE_BUILD_FILE)
+$(info $$DOCKER_COMPOSE_MAIN_FILE_SELECTED is [${DOCKER_COMPOSE_MAIN_FILE_SELECTED}])
+endif
+
+###############################################################################
 # internal target select-user (set the good user for app or horizon container)
 ###############################################################################
 select-user:
-ifeq ($(filter $(filter-out $@,$(MAKECMDGOALS)),$(LARADOCK_CONTAINERS)),app)
+ifeq ($(filter $(filter-out $@,$(MAKECMDGOALS)),$(LARADOCK_CONTAINERS)), app)
 DOCKER_USER = -u node
 endif
 
