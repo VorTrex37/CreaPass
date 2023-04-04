@@ -91,10 +91,21 @@ app.post('/generate', authenticationMiddleware, (req, res, next) => {
   charDB = charDB.filter(char => !filter.includes(char));
 
   // PASSWORD GENERATION
-  size = (size > '' ? size : '20');
-  for (let i = 0; i < size; i++) {
-    password = password + charDB[Math.floor(Math.random() * charDB.length)];
+  function fisherYatesShuffle(array) {
+    let currentIndex = array.length;
+
+    while (currentIndex !== 0) {
+      let randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      let temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+
+    return array;
   }
+  password = fisherYatesShuffle(charDB).slice(0, size).join('');
 
   // PASSWORD ENTROPY
   let entropy;
