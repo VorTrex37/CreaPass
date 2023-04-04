@@ -75,8 +75,6 @@ COPY ./src/keys/ ./keys/
 COPY ./src/keyList.json ./
 COPY ./src/.gitignore ./
 COPY ./src/index.js ./
-COPY ./src/index.js ./
-COPY ./src/README.md ./
 
 ###############################################################################	
 # Install dependencies
