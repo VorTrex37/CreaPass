@@ -14,8 +14,13 @@ function getKeyList() {
   }
   return JSON.parse(fs.readFileSync('keyList.json', 'utf8'));
 }
+
 const keyList = getKeyList();
 
+let lowercase = [];
+let uppercase  = [];
+let digits  = [];
+let specials  = [];
 
 // EXPRESS SETUP
 // -------------
@@ -29,6 +34,15 @@ const options = {
   cert: fs.readFileSync('keys/cert.pem')
 };
 
+// CHARACTER LIST GENERATOR
+// 
+function charList (p, q, d = 1) {
+  const a = p.charCodeAt(0),
+    z = q.charCodeAt(0);
+  return [...Array(Math.floor((z - a) / d) + 1)].map((e, i) =>
+    String.fromCharCode(a + i * d)
+  );
+};
 
 // AUTHENTICATION MIDDLEWARE
 // -------------------------
@@ -56,13 +70,6 @@ app.post('/generate', authenticationMiddleware, (req, res, next) => {
   let size = req.body.size ? req.body.size : 20;
   let allowed = req.body.allowed ? req.body.allowed : '';
   let filter = req.body.filter ? req.body.filter : '';
-
-  const lowercase = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-    'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-  const uppercase = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-  const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-  const specials = ['&', '#', '-', '_', '@', '+', '-', '*', '$', '€', '?', '!'];
 
   let charDB = [];
   let password = '';
@@ -109,4 +116,8 @@ app.post('/generate', authenticationMiddleware, (req, res, next) => {
 
 https.createServer(options, app).listen(process.env.PORT_NODE, () => {
   console.log('CreaPass app listening on port ' + process.env.PORT_NODE);
+  lowercase = charList('a', 'z');
+  uppercase = charList('A', 'Z');
+  digits = charList('0', '9');
+  specials = '&#-_@+-*$€?!'.split('');
 });
