@@ -1,6 +1,3 @@
-[
-	{
-		"name":"Example de nom",
-		"key":"Exemple de clé"
-	}
-]
+{
+	"Example de clé": "Exemple de nom"
+}

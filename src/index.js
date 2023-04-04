@@ -7,14 +7,7 @@ import fs from 'fs';
 // ---------
 
 dotenv.config();
-
-function getKeyList() {
-  if(!fs.existsSync('keyList.json')) {
-    fs.writeFileSync('keyList.json', '[\n\t{\n\tname:"Example de nom",\n\tkey:"Exemple de clé"\n\t},\n]');
-  }
-  return JSON.parse(fs.readFileSync('keyList.json', 'utf8'));
-}
-const keyList = getKeyList();
+let keyList = {};
 
 
 // EXPRESS SETUP
@@ -38,7 +31,7 @@ const authenticationMiddleware = (req, res, next) => {
   if (key == null || key == undefined) {
       return res.sendStatus(401);
   }
-  if (keyList.find((elem) => elem.key === key)) {
+  if (keyList[key] !== undefined) {
     next();
   }
   return res.sendStatus(403);
@@ -109,4 +102,9 @@ app.post('/generate', authenticationMiddleware, (req, res, next) => {
 
 https.createServer(options, app).listen(process.env.PORT_NODE, () => {
   console.log('CreaPass app listening on port ' + process.env.PORT_NODE);
+
+  if(!fs.existsSync('keyList.json')) {
+    fs.writeFileSync('keyList.json', '{\n\t"Example de clé":"Exemple de nom"\n}');
+  }
+  keyList = JSON.parse(fs.readFileSync('keyList.json', 'utf8'));
 });
