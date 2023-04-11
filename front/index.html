@@ -12,21 +12,29 @@
   </head>
   <body class="p-3">
 
-    <h1 class="text-center mb-4">Créapass - Frontend de démonstration</h1>
+    <h1 class="text-center mb-3">CreaPass - Frontend de démonstration</h1>
 
 
     <!-- Password generation options -->
-    <div class="card w-50 mx-auto mb-4">
+    <div class="card w-50 mx-auto mb-3">
         <div class="card-body">
 
+            <!-- Key -->
+            <div class="mb-3">
+                <h6 class="card-subtitle mb-2">Clé d'API :</h6>
+                <input type="text" id="apiKey" class="form-control" placeholder="Par défaut: Vide">
+            </div>
+
+            <hr class="mb-3">
+
             <!-- Size -->
-            <div class="mb-4">
+            <div class="mb-3">
                 <h6 class="card-subtitle mb-2">Longueur du mot de passe :</h6>
                 <input type="number" id="passwordSize" class="form-control" placeholder="Par défaut: 20">
             </div>
 
             <!-- Character sets -->
-            <div class="mb-4">
+            <div class="mb-3">
                 <h6 class="card-subtitle mb-2">Jeux de caractères :</h6>
                 <div class="form-check">
                     <input id="lowercaseCheck" class="form-check-input" type="checkbox">
@@ -47,7 +55,7 @@
             </div>
 
             <!-- Ignored characters -->
-            <div class="mb-4">
+            <div class="mb-3">
                 <h6 class="card-subtitle mb-2">Caractères à ignorer :</h6>
                 <input type="text" id="passwordIgnoredChars" class="form-control" placeholder="Par défaut: Vide">
             </div>
@@ -63,15 +71,21 @@
         <div class="card-body">
 
         <!-- Password -->
-        <div class="mb-4">
+        <div class="mb-3">
             <h6 class="card-subtitle mb-1">Mot de passe :</h6>
             <span id="generatedPassword" class="fw-bold"></span>
         </div>
 
         <!-- Entropy -->
-        <div>
+        <div class="mb-3">
             <h6 class="card-subtitle mb-1">Entropie :</h6>
             <span id="generatedEntropy" class="fw-bold"></span>
+        </div>
+
+        <!-- Error display -->
+        <div>
+            <h6 class="card-subtitle mb-1">Message d'erreur :</h6>
+            <span id="errorMsg" class="fw-bold"></span>
         </div>
 
         </div>
@@ -83,6 +97,8 @@
 
     <script type = "text/javascript">
         function getPassword() {
+            let apiKey = $("#apiKey").val();
+
             let data = {};
 
             let size = $("#passwordSize").val();
@@ -110,11 +126,18 @@
                 data: data,
                 dataType : "json",
                 beforeSend: function (xhr) {
-                    xhr.setRequestHeader('x-api-key', 'Example de clé');
+                    if (apiKey > '') {
+                        xhr.setRequestHeader('x-api-key', apiKey);
+                    }
                 },
             }).done(function(response) {
                 $("#generatedPassword").text(response.password);
                 $("#generatedEntropy").text(response.entropy);
+                $("#errorMsg").text('');
+            }).fail(function(xhr, status, error) {
+                $("#generatedPassword").text('');
+                $("#generatedEntropy").text('');
+                $("#errorMsg").text(error);
             });
         }
     </script>
